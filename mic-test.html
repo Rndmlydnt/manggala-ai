@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MANGGALA - Tes Mikrofon</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 30px 18px;
+  background: #080b12;
+  color: #e8eeee;
+  font-family: Arial, sans-serif;
+}
+main {
+  max-width: 550px;
+  margin: 50px auto;
+  padding: 25px;
+  background: #111923;
+  border: 1px solid #263a40;
+  border-radius: 20px;
+}
+h1 { color: #75c9bd; letter-spacing: 4px; }
+p { line-height: 1.6; }
+button {
+  width: 100%;
+  padding: 16px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #176e70;
+  color: white;
+  font-size: 16px;
+}
+#status {
+  margin-top: 22px;
+  padding: 15px;
+  background: #080f17;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+small { color: #91aaa9; }
+</style>
+</head>
+<body>
+<main>
+  <h1>MANGGALA</h1>
+  <h3>MICROPHONE DIAGNOSTIC</h3>
+  <p>Pengujian akses mikrofon Huawei MatePad 12 X.</p>
+
+  <button id="start">AKTIFKAN MIKROFON</button>
+  <button id="stop">MATIKAN MIKROFON</button>
+
+  <div id="status">Status: Belum diuji.</div>
+  <p><small>Tes ini hanya memeriksa akses mikrofon. Tidak merekam atau mengirim suara ke server.</small></p>
+</main>
+
+<script>
+const statusBox = document.getElementById("status");
+let stream = null;
+
+document.getElementById("start").onclick = async () => {
+  try {
+    if (!navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia) {
+      throw new Error("getUserMedia tidak tersedia");
+    }
+
+    statusBox.textContent = "Meminta akses mikrofon...";
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false
+    });
+
+    const tracks = stream.getAudioTracks();
+
+    statusBox.textContent =
+      "BERHASIL! Mikrofon dapat diakses.\n\n" +
+      "Nama perangkat: " + (tracks[0].label || "Tidak diketahui") +
+      "\nStatus: " + tracks[0].readyState +
+      "\nJumlah mikrofon aktif: " + tracks.length;
+
+  } catch (error) {
+    statusBox.textContent =
+      "GAGAL MENGAKSES MIKROFON\n\n" +
+      "Kode: " + error.name +
+      "\nPesan: " + error.message;
+  }
+};
+
+document.getElementById("stop").onclick = () => {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+  statusBox.textContent = "Mikrofon sudah dimatikan.";
+};
+</script>
+</body>
+</html>
