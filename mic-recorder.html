@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MANGGALA Audio Recorder</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  background: #080b12;
+  color: #e8eeee;
+  font-family: Arial, sans-serif;
+  padding: 25px 15px;
+}
+main {
+  max-width: 550px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #111923;
+  border: 1px solid #29413e;
+  border-radius: 18px;
+}
+h1 { color: #75c9bd; letter-spacing: 4px; }
+button {
+  width: 100%;
+  padding: 16px;
+  margin: 8px 0;
+  border: 0;
+  border-radius: 10px;
+  background: #176e70;
+  color: white;
+  font-size: 16px;
+}
+button:disabled { opacity: .4; }
+#status {
+  padding: 15px;
+  margin-top: 15px;
+  background: #080f17;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+audio { width: 100%; margin-top: 15px; }
+</style>
+</head>
+<body>
+<main>
+<h1>MANGGALA</h1>
+<h3>VOICE RECORDER TEST</h3>
+
+<p>Uji kemampuan MANGGALA merekam suara Anda.</p>
+
+<button id="start">🎙 MULAI MEREKAM</button>
+<button id="stop" disabled>⏹ BERHENTI MEREKAM</button>
+
+<div id="status">Status: Siap.</div>
+<audio id="player" controls hidden></audio>
+
+</main>
+
+<script>
+const statusBox = document.getElementById("status");
+const player = document.getElementById("player");
+const startBtn = document.getElementById("start");
+const stopBtn = document.getElementById("stop");
+
+let stream = null;
+let recorder = null;
+let chunks = [];
+let audioUrl = null;
+
+startBtn.onclick = async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: true
+    });
+
+    const types = [
+      "audio/webm;codecs=opus",
+      "audio/mp4",
+      "audio/webm"
+    ];
+
+    const mime = types.find(type =>
+      MediaRecorder.isTypeSupported(type)
+    );
+
+    recorder = mime
+      ? new MediaRecorder(stream, { mimeType: mime })
+      : new MediaRecorder(stream);
+
+    chunks = [];
+
+    recorder.ondataavailable = event => {
+      if (event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, {
+        type: recorder.mimeType
+      });
+
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+
+      audioUrl = URL.createObjectURL(blob);
+      player.src = audioUrl;
+      player.hidden = false;
+
+      statusBox.textContent =
+        "BERHASIL MEREKAM!\n\n" +
+        "Format: " + recorder.mimeType +
+        "\nUkuran: " + blob.size + " bytes\n" +
+        "Silakan putar rekaman untuk menguji suara.";
+
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    };
+
+    recorder.start();
+
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+
+    statusBox.textContent =
+      "Merekam suara...\nSilakan bicara selama 5-10 detik.";
+
+  } catch (error) {
+    statusBox.textContent =
+      "GAGAL: " + error.name +
+      "\n" + error.message;
+
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  }
+};
+
+stopBtn.onclick = () => {
+  if (recorder && recorder.state === "recording") {
+    recorder.stop();
+  }
+};
+</script>
+</body>
+</html>
