@@ -1,0 +1,306 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10151d">
+<title>MANGGALA AI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #10151d;
+  color: #f4f6fa;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 850px;
+  margin: auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #29313d;
+  padding-bottom: 18px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.logo span {
+  color: #55c6d9;
+}
+
+.status {
+  font-size: 12px;
+  color: #7bd9b0;
+}
+
+.hero {
+  text-align: center;
+  padding: 45px 10px 25px;
+}
+
+.orb {
+  width: 115px;
+  height: 115px;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  border: 1px solid #4b9dac;
+  background: radial-gradient(circle, #285566, #142631 65%, #10151d);
+  box-shadow: 0 0 40px #236b7a55;
+  display: grid;
+  place-items: center;
+  font-size: 38px;
+  color: #8ee8f1;
+}
+
+h1 {
+  font-size: 25px;
+  margin: 0 0 10px;
+}
+
+.subtitle {
+  color: #99a6b5;
+  font-size: 14px;
+}
+
+.chat {
+  flex: 1;
+  min-height: 180px;
+  padding: 12px 0;
+}
+
+.message {
+  padding: 14px 16px;
+  margin: 12px 0;
+  border-radius: 15px;
+  line-height: 1.6;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.ai {
+  background: #1c2632;
+  border: 1px solid #2a3948;
+  margin-right: 12%;
+}
+
+.user {
+  background: #234b59;
+  margin-left: 12%;
+}
+
+.label {
+  font-size: 10px;
+  color: #77d6e3;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.input-area {
+  display: flex;
+  gap: 9px;
+  padding: 12px;
+  background: #1b232e;
+  border: 1px solid #34404d;
+  border-radius: 18px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: white;
+  background: transparent;
+  font-size: 15px;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 15px;
+  color: white;
+  background: #287d8c;
+  font-size: 15px;
+}
+
+button:active {
+  opacity: .7;
+}
+
+.mic {
+  background: #303e4b;
+}
+
+.footer {
+  text-align: center;
+  color: #718092;
+  font-size: 11px;
+  padding: 16px 0 5px;
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">MANG<span>G</span>ALA</div>
+  <div class="status" id="status">● SIAP</div>
+</header>
+
+<section class="hero">
+  <div class="orb">M</div>
+  <h1>Selamat datang.</h1>
+  <div class="subtitle">
+    Saya Manggala, asisten AI pribadi Anda.
+  </div>
+</section>
+
+<main class="chat" id="chat">
+  <div class="message ai">
+    <div class="label">MANGGALA</div>
+    Halo! Saya siap membantu Anda.
+    Silakan ketik atau ucapkan perintah.
+  </div>
+</main>
+
+<form class="input-area" id="form">
+  <button type="button" class="mic" id="mic">🎙</button>
+  <input id="prompt" placeholder="Perintahkan sesuatu..." autocomplete="off">
+  <button type="submit">➤</button>
+</form>
+
+<div class="footer">
+  MANGGALA AI · PERSONAL ASSISTANT
+</div>
+
+</div>
+
+<script>
+const chat = document.getElementById("chat");
+const form = document.getElementById("form");
+const prompt = document.getElementById("prompt");
+const statusText = document.getElementById("status");
+
+function addMessage(text, type) {
+  const box = document.createElement("div");
+  box.className = "message " + type;
+
+  const label = document.createElement("div");
+  label.className = "label";
+  label.textContent = type === "ai" ? "MANGGALA" : "ANDA";
+
+  const content = document.createElement("div");
+  content.textContent = text;
+
+  box.appendChild(label);
+  box.appendChild(content);
+  chat.appendChild(box);
+
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function reply(text) {
+  const lower = text.toLowerCase();
+  let answer = "";
+
+  if (lower.includes("nama")) {
+    answer = "Nama saya Manggala, asisten AI pribadi Anda.";
+  } else if (lower.includes("halo") || lower.includes("hai")) {
+    answer = "Halo! Senang bisa membantu Anda. Ada yang bisa saya kerjakan?";
+  } else if (lower.includes("siapa")) {
+    answer = "Saya Manggala, asisten digital yang sedang kita bangun bersama.";
+  } else if (lower.includes("terima kasih")) {
+    answer = "Sama-sama. Saya siap membantu Anda.";
+  } else {
+    answer = "Perintah Anda sudah saya terima. Saat ini saya masih dalam mode demonstrasi. Otak AI akan kita hubungkan pada tahap berikutnya.";
+  }
+
+  addMessage(answer, "ai");
+  statusText.textContent = "● SIAP";
+  speak(answer);
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+
+  window.speechSynthesis.cancel();
+
+  const voice = new SpeechSynthesisUtterance(text);
+  voice.lang = "id-ID";
+  voice.rate = 1;
+  voice.pitch = 1;
+
+  window.speechSynthesis.speak(voice);
+}
+
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const text = prompt.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  prompt.value = "";
+
+  statusText.textContent = "● MEMPROSES";
+  setTimeout(() => reply(text), 500);
+});
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+document.getElementById("mic").addEventListener("click", function() {
+  if (!SpeechRecognition) {
+    alert("Fitur suara belum didukung browser ini. Coba gunakan browser lain.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "id-ID";
+  recognition.interimResults = false;
+
+  statusText.textContent = "● MENDENGARKAN";
+
+  recognition.onresult = function(event) {
+    prompt.value = event.results[0][0].transcript;
+    form.requestSubmit();
+  };
+
+  recognition.onerror = function() {
+    statusText.textContent = "● SIAP";
+    alert("Mikrofon tidak berhasil digunakan. Periksa izin mikrofon.");
+  };
+
+  recognition.onend = function() {
+    if (statusText.textContent === "● MENDENGARKAN") {
+      statusText.textContent = "● SIAP";
+    }
+  };
+
+  recognition.start();
+});
+</script>
+
+</body>
+</html>
